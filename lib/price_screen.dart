@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'Spinner.dart';
 import 'coin_data.dart';
 import 'dart:io' show Platform;
 
@@ -13,6 +14,7 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'AUD';
   List<String> lastPrices;
+  bool isLoading = false;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -39,12 +41,18 @@ class _PriceScreenState extends State<PriceScreen> {
   CupertinoPicker iOSPicker() {
     List<Text> pickerItems = [];
     for (String currency in currenciesList) {
-      pickerItems.add(Text(currency));
+      pickerItems.add(Text(
+        currency,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 40,
+        ),
+      ));
     }
 
     return CupertinoPicker(
       backgroundColor: Colors.lightBlue,
-      itemExtent: 32.0,
+      itemExtent: 50.0,
       onSelectedItemChanged: (selectedIndex) {
         lastPrices = null;
         setState(() {
@@ -58,9 +66,13 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getData(String currency) async {
+    setState(() {
+      isLoading = true;
+    });
     List<String> lastPrices = await CoinData.getCoinData(currency);
     setState(() {
       this.lastPrices = lastPrices;
+      isLoading = false;
     });
   }
 
@@ -98,6 +110,9 @@ class _PriceScreenState extends State<PriceScreen> {
                 lastPrice: lastPrices == null ? '?' : lastPrices[2],
                 selectedCurrency: selectedCurrency,
                 crypto: cryptoList[2],
+              ),
+              Spinner(
+                isLoading: isLoading,
               ),
             ],
           ),
