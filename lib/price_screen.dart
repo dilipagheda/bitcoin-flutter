@@ -3,14 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'coin_data.dart';
 import 'dart:io' show Platform;
 
+import 'crypto_card.dart';
+
 class PriceScreen extends StatefulWidget {
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
-  String lastPrice;
+  String selectedCurrency = 'AUD';
+  List<String> lastPrices;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -29,6 +31,7 @@ class _PriceScreenState extends State<PriceScreen> {
         setState(() {
           selectedCurrency = value;
         });
+        getData(selectedCurrency);
       },
     );
   }
@@ -43,23 +46,28 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        lastPrices = null;
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];
+        });
+        print(selectedCurrency);
+        getData(selectedCurrency);
       },
       children: pickerItems,
     );
   }
 
-  void getData() async {
-    String lastPrice = await CoinData.getCoinData();
+  void getData(String currency) async {
+    List<String> lastPrices = await CoinData.getCoinData(currency);
     setState(() {
-      this.lastPrice = lastPrice;
+      this.lastPrices = lastPrices;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getData();
+    getData(selectedCurrency);
   }
 
   @override
@@ -72,26 +80,26 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              CryptoCard(
+                lastPrice: lastPrices == null ? '?' : lastPrices[0],
+                selectedCurrency: selectedCurrency,
+                crypto: cryptoList[0],
               ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $lastPrice USD',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
+              CryptoCard(
+                lastPrice: lastPrices == null ? '?' : lastPrices[1],
+                selectedCurrency: selectedCurrency,
+                crypto: cryptoList[1],
               ),
-            ),
+              CryptoCard(
+                lastPrice: lastPrices == null ? '?' : lastPrices[2],
+                selectedCurrency: selectedCurrency,
+                crypto: cryptoList[2],
+              ),
+            ],
           ),
           Container(
             height: 150.0,
