@@ -7,7 +7,8 @@
 The objective of this app is to learn about using Cupertino and Material Widgets in parallel and providing a different user interface depending on the platform. Starter files were provided by London Appbrewery and I developed the app from scratch on top.
 
 ## Technology Used
-- Flutter
+- Flutter 
+- Dart
 - Http Library
 - Flutter Spinkit
 
